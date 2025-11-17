@@ -13,6 +13,7 @@ def calculate_total_fines_per_ward(ward_dataset_path, output_path):
     # Group by ward and calculate total fines
     total_fines_per_ward = ward_df.groupby('AREA_L_CD')['set_fine_amount'].sum().reset_index()
     ward_counts = ward_df.groupby('AREA_L_CD').size().reset_index(name='ticket_count')
+    ward_counts['ticket_percentage'] = (ward_counts['ticket_count'] / ward_counts['ticket_count'].sum()) * 100
     print("tickets per ward:")
     print(ward_counts)
     
