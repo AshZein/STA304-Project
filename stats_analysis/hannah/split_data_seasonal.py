@@ -13,7 +13,7 @@ os.makedirs(parkingData + "summer", exist_ok=True)
 os.makedirs(parkingData + "fall", exist_ok=True)
 os.makedirs(parkingData + "winter", exist_ok=True)
 
-for f in glob.glob(parkingData + "processed/*/*"):
+for f in glob.glob(parkingData + "processed/2013/*"):
     print(f)
     df = pd.read_csv(f)
     yr = f.split("_")[2]
