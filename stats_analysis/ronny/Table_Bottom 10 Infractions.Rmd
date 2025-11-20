@@ -1,0 +1,32 @@
+```{r bottom10-average}
+
+#This section creates a table with the 10 least common types of infraction and its average and proportion of # of tickets issued
+
+bottom10 <- summary_infraction[
+  order(avg_tickets_per_year_full_period)][1:10]
+
+bottom10_table <- bottom10[
+  ,
+  .(
+    infraction_description,
+    avg_tickets_per_year =
+      format(
+        round(avg_tickets_per_year_full_period, 2),  # use more precision (they're tiny)
+        big.mark = ",",
+        nsmall = 4
+      ),
+    proportion =
+      scales::percent(proportion, accuracy = 0.1)
+  )
+]
+
+knitr::kable(
+  bottom10_table,
+  col.names = c(
+    "Infraction Description",
+    "Avg Tickets Per Year",
+    "Proportion of All Tickets"
+  ),
+  caption = "Bottom 10 Parking Infractions: Smallest Average Tickets Per Year"
+)
+```
