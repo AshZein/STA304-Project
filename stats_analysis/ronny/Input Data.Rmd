@@ -1,0 +1,25 @@
+```{r load data}
+# This chunk of data asks R to read all the files and combine them into 1 big table
+files <- list.files("tickets", pattern = "\\.csv$", full.names = TRUE)
+
+all_years <- rbindlist(lapply(files, function(f) {
+
+  year <- as.integer(gsub("[^0-9]", "", basename(f)))
+  message("Processing file: ", f, "   Year detected: ", year)
+
+  dt <- fread(f, select = c("infraction_code", "infraction_description"))
+
+  yearly_summary <- dt[, .N, by = .(infraction_code, infraction_description)]
+
+  yearly_summary[, year := year]
+
+  return(yearly_summary)
+}))
+
+preview_all_years <- head(all_years)
+knitr::kable(
+  preview_all_years,
+  col.names = c("Infraction Code", "Infraction Description", "Ticket Count", "Year"),
+  caption = "Sample of Combined Parking Ticket Data"
+)
+```
