@@ -111,7 +111,7 @@ def plot_bar(categories, values, title=None, xlabel=None, ylabel=None, show_mean
     # --- Label each bar with its numeric value ---
     for i, v in enumerate(values):
         ax.text(
-            i, v + 0.02 * max(values),
+            i+1, v + 0.02 * max(values),  # month needs i + 1, v + 0.02 * max(values) for some reason
             f"{v:.0f}",  # integer count
             ha='center', va='bottom',
             fontsize=10
