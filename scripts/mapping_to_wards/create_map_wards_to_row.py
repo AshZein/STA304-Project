@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import re
 from shapely.geometry import Point
 import numpy as np
+import swifter
+from tqdm import tqdm
+
+tqdm.pandas()
+
 
 def parse_address(text):
     if not isinstance(text, str):
@@ -70,31 +75,47 @@ if __name__ == "__main__":
     # --- DEVELOPMENT: take a reproducible random subset for plotting ---
     # This avoids expensive nearest-point matching on the full dataset while
     # developing/visualizing. Change n_sample or remove during final runs.
-    n_sample = 1000
-    if len(df) > n_sample:
-        df = df.sample(n=n_sample, random_state=42).reset_index(drop=True)
-    else:
-        df = df.reset_index(drop=True)
+    # n_sample = 1000
+    # if len(df) > n_sample:
+    #     df = df.sample(n=n_sample, random_state=42).reset_index(drop=True)
+    # else:
+    #     df = df.reset_index(drop=True)
+
 
     # Parse ticket addresses
-    df[["ticket_num", "ticket_street"]] = df.apply(
+    df[["ticket_num", "ticket_street"]] = df.progress_apply(
         extract_street_info, axis=1, result_type="expand"
     )
-    
-    # 🔍 Filter to just one street for testing
-    test_street = "KING ST W"       # <-- pick any street you want to test
-    df = df[df["ticket_street"] == test_street].reset_index(drop=True)
+
+    # Filter to just one street for testing
+    # test_street = "KING ST W"       # <-- pick any street you want to test
+    # df = df[df["ticket_street"] == test_street].reset_index(drop=True)
 
     #print(f"Testing with {len(df)} tickets on {test_street}")
 
     # Match to nearest address point
-    df["geometry"] = df.apply(find_nearest_point, axis=1)
+    df["geometry"] = df.swifter.progress_bar(True).apply(find_nearest_point, axis=1)
 
     # Convert to GeoDataFrame
     tickets_gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
     
     tickets_with_wards = gpd.sjoin(tickets_gdf, wards, how="left", predicate="within")
     print(tickets_with_wards[["ticket_street", "AREA_L_CD"]])
+    
+    output_file = "../../parkingData/Parking_Tags_Data_2024_with_wards.csv"
+    #tickets_with_wards.to_csv(output_file, index=False)
+    tickets_with_wards[[
+        "tag_number_masked",
+        "date_of_infraction",
+        "infraction_code",
+        "infraction_description",
+        "set_fine_amount",
+        "ticket_street",
+        "AREA_L_CD",      # ward number
+        "AREA_NAME"       # ward name
+    ]].to_csv(output_file, index=False)
+    
+    print(f"Saved ward-joined dataset to {output_file}")
 
 
     # Plot
@@ -178,9 +199,9 @@ if __name__ == "__main__":
 #             df = df_part
 #         else:
 #             df = pd.concat([df, df_part], ignore_index=True)
-#     df[["ticket_num", "ticket_street"]] = df.apply(extract_street_info, axis=1, result_type="expand")
+#     df[["ticket_num", "ticket_street"]] = df.progress_apply(extract_street_info, axis=1, result_type="expand")
     
-#     df["geometry"] = df.apply(find_nearest_point, axis=1)
+#     df["geometry"] = df.progress_apply(find_nearest_point, axis=1)
     
 #     tickets_gdf = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
     
