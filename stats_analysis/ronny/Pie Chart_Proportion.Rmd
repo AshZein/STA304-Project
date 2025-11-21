@@ -1,0 +1,38 @@
+```{r pie chart showing the average proportion of each infraction from 2008-2024}
+# -----------------------------------------------------------
+# Pie chart of top 10 infractions with percentage shown
+# -----------------------------------------------------------
+
+
+summary_infraction <- summary_infraction[order(-proportion)]
+
+top10 <- summary_infraction[1:10]
+
+others_prop <- summary_infraction[11:.N, sum(proportion)]
+
+pie_data <- rbind(
+  top10[, .(infraction_description, proportion)],
+  data.table(infraction_description = "Others",
+             proportion = others_prop)
+)
+
+pie_data[, legend_label :=
+           paste0(
+             infraction_description,
+             " (",
+             scales::percent(proportion, accuracy = 0.1),
+             ")"
+           )
+]
+
+ggplot(pie_data,
+       aes(x = "", y = proportion, fill = legend_label)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  labs(
+    title = "Top 10 Parking Infractions (with Percentage in Legend)",
+    fill = "Infraction Type"
+  ) +
+  scale_fill_discrete(guide = guide_legend(ncol = 1)) +
+  theme_void()
+```
