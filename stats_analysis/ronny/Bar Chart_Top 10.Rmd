@@ -1,0 +1,28 @@
+```{r Bar Chart for top 10 average infractions}
+# -----------------------------------------------------------
+# Plot the Top 10 infractions ranked by their average number
+# of tickets issued per year (2008–2024).
+# -----------------------------------------------------------
+top10 <- summary_infraction[order(-avg_tickets_per_year_full_period)][1:10]
+
+ggplot(top10,
+       aes(x = reorder(infraction_description, avg_tickets_per_year_full_period),
+           y = avg_tickets_per_year_full_period)) +
+  geom_col() +
+  geom_text(
+    aes(label = format(
+      round(avg_tickets_per_year_full_period, 2),
+      big.mark = ",",
+      nsmall = 2
+    )),
+    hjust = -0.1,
+    size = 3.8
+  ) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Parking Infractions — Average Tickets Per Year",
+    x = "Infraction Description",
+    y = "Average Tickets Per Year"
+  ) +
+  ylim(0, max(top10$avg_tickets_per_year_full_period) * 1.15)
+```

@@ -1,0 +1,60 @@
+```{r top10 most frequent infraction for 2008 and 2024}
+
+# ---- 2008 ----
+inf_2008 <- all_years[year == 2008,
+                      .(total_2008 = sum(N)),
+                      by = infraction_description]
+
+total_2008_sum <- sum(inf_2008$total_2008)
+
+inf_2008 <- inf_2008[
+  ,
+  proportion_2008 := total_2008 / total_2008_sum
+][order(-total_2008)][1:10]
+
+inf_2008_print <- inf_2008[
+  ,
+  .(
+    infraction_description,
+    total_2008 = format(total_2008, big.mark = ","),
+    proportion_2008 = scales::percent(proportion_2008, accuracy = 0.1)
+  )
+]
+
+
+# ---- 2024 ----
+inf_2024 <- all_years[year == 2024,
+                      .(total_2024 = sum(N)),
+                      by = infraction_description]
+
+total_2024_sum <- sum(inf_2024$total_2024)
+
+inf_2024 <- inf_2024[
+  ,
+  proportion_2024 := total_2024 / total_2024_sum
+][order(-total_2024)][1:10]
+
+inf_2024_print <- inf_2024[
+  ,
+  .(
+    infraction_description,
+    total_2024 = format(total_2024, big.mark = ","),
+    proportion_2024 = scales::percent(proportion_2024, accuracy = 0.1)
+  )
+]
+
+
+# ---- Output Tables ----
+knitr::kable(
+  inf_2008_print,
+  col.names = c("Infraction Description", "Total Tickets", "Proportion"),
+  caption = "Top 10 Parking Infractions in 2008"
+)
+
+knitr::kable(
+  inf_2024_print,
+  col.names = c("Infraction Description", "Total Tickets", "Proportion"),
+  caption = "Top 10 Parking Infractions in 2024"
+)
+
+```

@@ -1,0 +1,27 @@
+```{r chi-square using infraction description}
+# -----------------------------------------------------------
+# Chi-Square Test of Association
+#
+# Goal:
+#   Determine whether the distribution of parking infraction
+#   types in 2008 is significantly different from the
+#   distribution in 2024.
+#
+# Why this test?
+#   • Both variables (year and infraction type) are categorical.
+#   • We want to compare the pattern of ticket counts across years.
+#   • Chi-square tests whether differences are due to chance.
+# -----------------------------------------------------------
+table_2008_2024 <- all_years[year %in% c(2008, 2024),
+                             .(N = sum(N)),
+                             by = .(year, infraction_description)]
+
+# reshape to wide
+contingency <- dcast(table_2008_2024,
+                     infraction_description ~ year,
+                     value.var = "N",
+                     fill = 0)
+
+# run chi-square
+chisq.test(contingency[, -1])
+```
