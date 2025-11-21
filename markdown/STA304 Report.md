@@ -61,13 +61,13 @@ The original dataset lacked ward information, and so the ticket data was geocode
 
 When performing regional data and statistical analysis, heatmaps are an excellent way to visually compare regions and spot trends in the dataset. A heatmap representing the total tickets issued in each ward and another map representing the average fine in each ward is. These two maps show interesting patterns and clustering of fine amounts. 
 
-Box plots are another statistical tool which visualizes the spread in the data points. Creating a boxplot for each ward based on the fine amounts provides insight on the spread of the fine amounts within the ward. Indicating which wards have a large amount and which ones have a small amount of spread. Boxplots indicate where the fine amounts are most concentrated (higher fines mostly, lower fines, or an even spread.
+Box plots are another statistical tool which visualizes the spread in the data points. Creating a boxplot for each ward based on the fine amounts provides insight on the spread of the fine amounts within the ward. Indicating which wards have a large amount and which ones have a small amount of spread. Boxplots indicate where the fine amounts are most concentrated (higher fines mostly, lower fines, or an even spread).
 
 ## 1.3 Regional Analysis (wards)
 
 ### 1.3.1 Heatmaps of total tickets issued, and average fines per ward
 
-![][image1]  
+![image](figures/figure_1_1.png)  
 **Figure 1.1:** Map of the total number of parking tickets issued in each ward in Toronto during 2024
 
 The wards with the highest concentration of tickets issued are Spadina-Fort York, Toronto Centre, and University-Rosedale. These three wards primarily cover the downtown core. Downtown is where traffic volume, commercial density, and parking enforcement are the highest. Parking is very scarce in this area of Toronto, making it likely for more people to park in restricted areas. The map also illustrates how the number of tickets in each ward decreases the further it is from the downtown core.  
