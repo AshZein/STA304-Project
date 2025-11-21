@@ -72,7 +72,7 @@ Box plots are another statistical tool which visualizes the spread in the data p
 
 The wards with the highest concentration of tickets issued are Spadina-Fort York, Toronto Centre, and University-Rosedale. These three wards primarily cover the downtown core. Downtown is where traffic volume, commercial density, and parking enforcement are the highest. Parking is very scarce in this area of Toronto, making it likely for more people to park in restricted areas. The map also illustrates how the number of tickets in each ward decreases the further it is from the downtown core.  
     
-![][image2]  
+![image](figures/figure_1_2.jpeg)  
 **Figure 1.2:** Map of the average fine amount for each ward in the City of Toronto in 2024
 
 The ward with the highest average fine amount is Willowdale, while the remaining wards are much closer in average fine amounts. A higher average fine indicates that a larger proportion of high value violations are being issued in that ward.
@@ -82,7 +82,7 @@ In contrast, Willowdale issues fewer tickets, but a high number of high value ti
 
 ### 1.3.2 Spread in fines issued per ward
 
-![][image3]  
+![image](figures/figure_1_3.png)  
 **Figure 1.3:** Box plots of the fine amounts for each ticket issued in each ward
 
 This boxplot showcases that the spread in fine amounts differs drastically amongst the wards. Some wards have a tighter cluster of fines, indicating the fines given are more close in value, some wards have a large spread, meaning that a wider variety of infraction types are given in these wards.   
@@ -90,9 +90,9 @@ This boxplot showcases that the spread in fine amounts differs drastically among
 
 ### 1.3.3 Per ward summary statistics
 
-**![][image4]**  
+**![image](figures/figure_1_4.jpeg)**  
 **Figure 1.4:** Summary Statistics (1/2) including total counts, unique infraction types, and proportion of city wide tickets  
-**![][image5]**  
+**![image](figures/figure_1_5.jpeg)**  
 **Figure 1.5:** Summary Statistics (2/2) including the Mean, median and standard deviation of fines within each ward
 
 ## 1.4 Statistical Tests
@@ -151,17 +151,17 @@ Before performing regression analyses, we examined the aggregate characteristics
 
 ### 2.3.1 Seasonal summary 
 
-![][image6]  
+![image](figures/figure_2_1.png)  
 **Figure 2.1:** Fine amount distribution by season.
 
-![][image7]  
+![image](figures/figure_2_2.png)  
 **Figure 2.2:** Ticket frequency by season.
 
 The total number of parking tickets varied across seasons, with fall accounting for the largest share of infractions (593,182 tickets, 27.97% of the marginal annual total) and winter the fewest (462,342 tickets, 21.81% marginal). Summer and spring accounted for approximately 27% and 24% of the tickets, respectively. The mean set fine per infraction was relatively consistent across seasons, ranging from $46.18 in spring to $46.52 in fall, with a standard deviation of $0.15, indicating minimal variation in fines. The most frequent infraction type in all seasons was parking in a signed prohibited area, comprising 62,129 tickets in winter and 98,924 tickets in summer, which highlights a consistent enforcement focus on highway-signed parking violations. Overall, while ticket counts showed clear seasonal differences, the fine amounts themselves were stable, suggesting that changes in infraction frequency rather than fine policies drive seasonal variation.
 
 The distribution of infractions by season can also be observed through conditional percentages for each season within each year. 
 
-![][image8]  
+![image](figures/figure_2_3.png)  
 **Figure 2.3:** Conditional percentages of tickets by season for 2008-2024.
 
 Across the 2008-2024 period, the seasonal distribution of tickets is generally consistent with the overall marginal percentages (Figure 4), with fall and summer accounting for the largest share of tickets, and winter the smallest. Exceptions occur during 2020 and 2021, likely reflecting pandemic-related changes, where the frequency of infractions increased in fall  (\~39%), and spring tickets dropped sharply to about 9-12%. 
@@ -171,10 +171,10 @@ Overall, ticket counts show clear seasonal variation, with fall and summer consi
 ### 2.3.2 Monthly summary
 
 Monthly ticket counts gradually increase from February (140,374 tickets, 6.6% of the annual total) to a peak in October (204,337 tickets, 9.6%), suggesting that parking infractions rise in the autumn months before declining slightly in November and December.  
-![][image9]  
+![image](figures/figure_2_4.png)  
 **Figure 2.4:** Fine amount distribution by month.
 
-![][image10]  
+![image](figures/figure_2_5.png)  
 **Figure 2.5:** Ticket frequency by month.  
 Mean fines remained relatively stable across the year, ranging from $45.87 to $46.72 (SD ≈ $0.27), indicating consistent enforcement levels in terms of fine amounts. Across most months, the top infraction was parking in a prohibited area during the daytime, particularly dominant from March to November, whereas parking in a prohibited area without a permit was most common in January and April. These results indicate that seasonal and monthly patterns in ticket counts are primarily driven by fluctuations in infraction occurrence rather than changes in fine amounts.
 
@@ -182,10 +182,10 @@ Mean fines remained relatively stable across the year, ranging from $45.87 to $4
 
 Examining ticket counts and fines by hour of day reveals a clear diurnal pattern (Figure 2.6, Figure 2.7). The fewest tickets are issued during the early morning hours of 5-7 AM (11,022-52,745 tickets, 0.5-2.5% of the total daily tickets), whereas ticketing peaks between 9 AM and 1 PM (136,374-160,435 tickets, 6.4-7.5% of daily total), indicating concentrated enforcement during typical commuting hours. Late evening hours, particularly 10 PM-11 PM, also show elevated ticket counts relative to early morning. Mean fines similarly vary throughout the day, with higher fines observed during peak commuting hours at approximately 50-55 CAD between 7-10 AM and 2-4 PM, while the lowest fines occur during early morning hours (30-39 CAD between 0-6 AM). This pattern suggests that both the frequency of infractions and corresponding enforcement intensity follow predictable daily cycles, likely reflecting traffic flow, parking demand, and municipal enforcement scheduling.
 
-![][image11]  
+![image](figures/figure_2_6.png)  
 **Figure 2.6:** Fine amount distribution by hour of day.
 
-![][image12]  
+![image](figures/figure_2_7.png)  
 **Figure 2.7:** Ticket frequency by hour of day.
 
 ### 2.3.4 Regression Methodology
@@ -268,23 +268,23 @@ The core of this section is to categorise parking tickets by different types of 
 
 There are in total 594 different types of infractions being issued. Below is a table of the top 10 and bottom 10 most common tickets issued on average per year. Based on these two tables, we can clearly see that different types of violations show quite significant differences in the number of tickets issued. However, based on this table alone, we cannot say with certainty that there is a difference. But later, we will use a chi-squared test to further demonstrate that such a difference does exist.
 
-![][image13]  
+![image](figures/figure_3_1_1.png)  
 **Figure 3.1.1**
 
-![][image14]  
+![image](figures/figure_3_1_2.png)  
 **Figure 3.1.2**
 
 From Figure 3.1.1 and Figure 3.1.3, we can see that the top 10 issued infractions represent a very large share of all tickets issued.The top 10 infraction types together account for 69.5% of total enforcement activity, while the majority of other violation types occur far less frequently.
 
-![][image15]  
+![image](figures/figure_3_1_3.png)  
 **Figure 3.1.3**
 
 ## 3.2 Top 10 Infraction Types in 2008 and 2024
 
-![][image16]  
+![image](figures/figure_3_2_1.png)  
 **Figure 3.2.1**
 
-![][image17]  
+![image](figures/figure_3_2_2.png)17]  
 **Figure 3.2.2** 
 
 **Seven out of ten** of the top 10 parking infractions from 2008 and 2024 are the same, and these includes:
@@ -347,10 +347,10 @@ Ticket issuance in Toronto has fluctuated considerably over the past 17 years. A
 
 The dataset spans more than 40 million parking tickets and includes timestamps, locations, fine amounts, infraction types, and ward-level geographic identifiers. Ticket counts and location--year aggregates were computed for all 17 years.
 
-![][image18]  
+![image](figures/figure_4_1.png)  
 **Figure 4.1**: Summary statistics table for ticket frequencies and fines
 
-## ![][image19]![][image20]
+## ![image](figures/figure_4_2_1.png)![image](figures/figure_4_2_2.png)
 
 **Figure 4.2**: Additional distributions and introductory plots
 
@@ -368,14 +368,14 @@ These addresses correspond to major institutional or commercial nodes with inten
 
 Within each year, a small number of these locations consistently represent large shares of the tickets among the top-10 hotspots. For instance, in some years a single location such as 1750 Finch Ave E accounts for more than 30% of tickets within the top-10 set. This ‘hotspot’ behaviour indicates that enforcement is not evenly distributed across all neighbourhoods but instead focuses on select corridors with persistent regulatory challenges.
 
-![][image21]  
+![image](figures/figure_4_3.png)  
 **Figure 4.3**: Tickets by location and year for the top 10 enforcement hotspots in Toronto (2008--2024).
 
 ## 4.4. Fine Amounts Across Years
 
 Average fine amounts have risen steadily over time. In 2008, the mean fine was approximately $38.85, increasing to around $50.27 by 2020 and reaching $67.99 by 2024\. For most of the period, the median fine remained stable at $30, before increasing to $50 in 2024\. This upward trend likely reflects updates to the City of Toronto's penalty schedules, inflationary adjustments, and the introduction of higher-value fines for priority offences (for example, stopping in transit zones or blocking bike lanes).
 
-![][image22]  
+![image](figures/figure_4_4.png)  
 **Figure 4.4**: Trend in average fine amounts issued in Toronto from 2008--2024.
 
 The sharp rise in both mean and median fines in the final years of the dataset suggests a policy shift toward more substantial penalties, particularly in 2024\.
@@ -391,12 +391,12 @@ While central locations dominate ticket volumes, they do not necessarily dominat
 
 These areas are often near high-demand commercial or institutional sites where infractions may involve fire routes, loading zones, or critical access points rather than minor metered violations. As a result, these locations exhibit substantially higher mean fines, even if they do not issue the largest number of tickets.
 
-![][image23]  
+![image](figures/figure_4_5.png)  
 **Figure 4.5**: Distribution of yearly average fines for the 20 highest-fine locations in Toronto.
 
 This contrast illustrates an important pattern: high-volume locations tend to issue a large number of lower-fine infractions (such as expired meters or permit issues), whereas high-fine locations specialize in more severe offences issued less frequently.
 
-**![][image24]**
+**![image](figures/figure_4_6.png)**
 
 **Figure 4.6:** Histogram of average fines across all location--year observations.
 
