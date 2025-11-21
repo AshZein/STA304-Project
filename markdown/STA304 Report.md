@@ -67,7 +67,7 @@ Box plots are another statistical tool which visualizes the spread in the data p
 
 ### 1.3.1 Heatmaps of total tickets issued, and average fines per ward
 
-![image](figures/figure_1_1.png)  
+![image](figures/figure_1_1.jpeg)  
 **Figure 1.1:** Map of the total number of parking tickets issued in each ward in Toronto during 2024
 
 The wards with the highest concentration of tickets issued are Spadina-Fort York, Toronto Centre, and University-Rosedale. These three wards primarily cover the downtown core. Downtown is where traffic volume, commercial density, and parking enforcement are the highest. Parking is very scarce in this area of Toronto, making it likely for more people to park in restricted areas. The map also illustrates how the number of tickets in each ward decreases the further it is from the downtown core.  
