@@ -1,0 +1,34 @@
+```{r table: avg. tickets per infraction}
+
+# This chunk provides a table showing the list of different infractions and the total # of tickets issued for each infraction and the annual average # of tickets issued for it
+
+years <- sort(unique(all_years$year))
+
+n_years <- length(years)
+
+summary_infraction <- all_years[
+  ,
+  .(total_tickets = sum(N)),
+  by = infraction_description
+]
+
+summary_infraction[
+  ,
+  avg_tickets_per_year_full_period := total_tickets / n_years
+]
+
+summary_infraction <- summary_infraction[order(-total_tickets)]
+
+summary_preview <- head(summary_infraction, 10)
+
+knitr::kable(
+  summary_preview,
+  col.names = c(
+    "Infraction Description",
+    "Total Tickets (2008–2024)",
+    "Avg Tickets Per Year"
+  ),
+  caption = "Summary of Parking Infractions: Total and Average Yearly Tickets (Top 10)"
+)
+
+```
