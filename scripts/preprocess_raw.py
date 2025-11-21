@@ -3,9 +3,9 @@ import os
 
 
 if __name__ == "__main__":
-    os.makedirs("./data/processed", exist_ok=True)
+    os.makedirs("../sortedParkingData", exist_ok=True)
     
-    for dataset_name in os.listdir("./parkingData"):
+    for dataset_name in os.listdir("../parkingData"):
         split_name = dataset_name.split("_")
         if len(split_name) < 5:
             current_year = split_name[-1].split(".")[0]
@@ -13,7 +13,7 @@ if __name__ == "__main__":
             current_year = split_name[3]
             
         if "Parking_Tags_Data_" in dataset_name:
-            dataset_path = "./parkingData/" + dataset_name
+            dataset_path = "../parkingData/" + dataset_name
             print(f"Processing {dataset_path}...")
             
             if current_year in ["2008", "2010"]:
@@ -47,9 +47,9 @@ if __name__ == "__main__":
 
             for year_month, group in df.groupby('year_month'):
                 year = year_month.split("_")[0]
-                os.makedirs(f"./data/processed/{year}", exist_ok=True)
+                os.makedirs(f"../sortedParkingData/{year}", exist_ok=True)
 
-                output_path = f"./data/processed/{year}/parking_data_{year_month}.csv"
+                output_path = f"../sortedParkingData/{year}/parking_data_{year_month}.csv"
                 group = group.drop(columns=["year_month"])
 
                 if os.path.exists(output_path):

@@ -45,12 +45,15 @@ if __name__ == "__main__":
 
             df['year_month'] = df['date_of_infraction'].dt.strftime('%Y_%m')
 
+
             for year_month, group in df.groupby('year_month'):
                 year = year_month.split("_")[0]
                 os.makedirs(f"../combinedYearlyParkingData/{year}", exist_ok=True)
 
                 output_path = f"../combinedYearlyParkingData/{year}/parking_data_{year}.csv"
                 group = group.drop(columns=["year_month"])
+                # Add city column with value 'Toronto'
+                group['city'] = 'Toronto'
 
                 if os.path.exists(output_path):
                     group.to_csv(output_path, mode='a', header=False, index=False)
