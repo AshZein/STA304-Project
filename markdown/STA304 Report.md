@@ -202,8 +202,10 @@ log(E(Y)) \= 0+1X1+2X2+ ...
 To perform this analysis, tickets were aggregated by season, month, and hour depending on the model. We then fit a Poisson regression of the form: ticket\_count \~ C(season) \+ month \+ hour. The baselines for each temporal variable are fixed to the fall season, January (month 1), and midnight (hour 0\) respectively. This approach provides coefficient estimates, significance tests, and goodness-of-fit metrics that indicate whether temporal variables explain observed variation in infraction counts.
 
 ### 2.3.5 Regression Analysis
+![image](figures/table_1.png)
+![image](figures/table_2.png)
 
-| Generalized Linear Model Regression Results \=================================================================== |  |  |  |  |
+<!-- | Generalized Linear Model Regression Results \=================================================================== |  |  |  |  |
 | ----- | ----: | :---- | :---- | ----: |
 | Dep. Variable:                Model:                                      Model Family:                 Link Function:                             Method:                                      Date:                     Time:                           No. Iterations:                      Covariance Type:             | ticket\_count  GLM Poisson   Log    IRLS Thu, 20 Nov 2025 00:34:18 100  nonrobust |  | No. Observations: Df Residuals: Df Model:  Scale: Log-Likelihood: Deviance: Pearson chi2: Pseudo R-squ. (CS):  | 131450                       131415                                     34                                   1.0000           \-6.9929e+05                     8.3594e+05                   9.02e+05 0.9463 |
 | \=================================================================== |  |  |  |  |
@@ -247,7 +249,7 @@ To perform this analysis, tickets were aggregated by season, month, and hour dep
 | C(hour)\[T.20\] | \-0.0989 | 0.004 | \-22.824 | 0 | \-0.107 | \-0.09 |
 | C(hour)\[T.21\] | \-0.5963 | 0.005 | \-118.445 | 0 | \-0.606 | \-0.586 |
 | C(hour)\[T.22\] | \-1.1832 | 0.006 | \-182.969 | 0 | \-1.196 | \-1.17 |
-| C(hour)\[T.23\] | \-1.2752 | 0.007 | \-189.325 | 0 | \-1.288 | \-1.262 |
+| C(hour)\[T.23\] | \-1.2752 | 0.007 | \-189.325 | 0 | \-1.288 | \-1.262 | -->
 
 The regression results indicate that temporal variables significantly influence the number of parking infractions. Seasonality was a strong predictor: relative to the baseline category (fall), spring exhibited a significant negative effect on ticket counts (β \= \-1.41 × 10¹¹, p \< 0.001), while summer showed a significant positive effect (β \= 1.57 × 10¹¹, p \= 0.002). Winter was associated with a significant reduction in ticketing compared to fall (β \= \-6.61 × 10¹⁰, p \< 0.001). These results suggest that ticketing activity fluctuates systematically with the seasons. Winter indicates the least amount of issued tickets, reasonably due to weather conditions.  
 Monthly effects showed more nuanced variation. Several mid-year months (June–August) were associated with significantly lower ticket counts, while December exhibited a positive effect (β \= 0.0776, p \< 0.001). This is likely due to the regression baseline set in January, and so months within the same season would have better correlation. This indicates a tendency for ticketing to vary over the calendar year, potentially linked to seasonal traffic flows or enforcement schedules. It would thus be reasonable to suggest that infractions occur more frequently during the start of the school year and peak commuting season.  
@@ -284,7 +286,7 @@ From Figure 3.1.1 and Figure 3.1.3, we can see that the top 10 issued infraction
 ![image](figures/figure_3_2_1.png)  
 **Figure 3.2.1**
 
-![image](figures/figure_3_2_2.png)17]  
+![image](figures/figure_3_2_2.png)  
 **Figure 3.2.2** 
 
 **Seven out of ten** of the top 10 parking infractions from 2008 and 2024 are the same, and these includes:
