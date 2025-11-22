@@ -1,12 +1,14 @@
-
-
 # **A Quantitative Study on the Frequency and Distribution of Parking Tickets**
 
 ## Hannah De Guzman, Ashkan Zeinolabedini, Bahaa Al Jalam, Ronny Chen
 
+<div style="page-break-after: always"></div>
+
 # **Abstract**
 
 Millions of parking tickets are given out annually by Toronto Police Services (TPS) in the city of Toronto. A dataset of annual parking ticket records is released by TPS to the public. This paper aims to identify overall significant trends in parking violations within the city. Regional analysis is also performed using city wards to provide more fine-grained less general insight and patterns. Seasonal, monthly, and hourly trend analysis is done to identify trends in certain time periods and make connections to social behaviours. Common infraction types are identified and the proportionality of these types is discussed. This study also explores other characteristics that may influence the issuing of parking tickets. Results of the analyses conducted aim to be a general overview of parking infraction trends and serve as a preliminary study for further investigative research.
+
+<div style="page-break-after: always"></div>
 
 # **Introduction**
 
@@ -48,6 +50,8 @@ All records contain complete values as per City of Toronto.
 | month | The month date that ticket was issued. | From date\_of\_infraction, values were converted to datetime. The month was then extracted from the date as a new discrete variable with range \[1,12\]. |
 | season | The season that ticket was issued in. | Using month variable, dataset values are sorted into seasons accordingly: spring \= \["03", "04", "05"\] summer \= \["06", "07", "08"\] fall \= \["09", "10", "11"\] winter \= \["12", "01", "02"\] Values are then given a season field as type str. |
 | hour | The hour of day that ticket was issued. | From time\_of\_infraction, values were converted to type int64 with range \[0, 23\].  |
+
+<div style="page-break-after: always"></div>
 
 # **1\. What Toronto Wards receive the highest percentage of parking tickets**
 
@@ -130,7 +134,7 @@ Performing a one-way ANOVA test to determine whether the mean fine amount differ
 
 These results indicate that the average fine amount is not the same across wards, the fine amounts differ by region. This also indicates that some wards issue significantly more high value fines than others. Therefore the level and degree of enforcement varies across the city. 
 
-# 
+<div style="page-break-after: always"></div>
 
 # **2\. Seasonality and Time**
 
@@ -257,7 +261,7 @@ Hourly effects revealed significant daily cycles in ticket issuance. Early morni
 
 Overall, the model exhibited a high degree of fit for count data, with a pseudo R² of 0.9463, indicating that the seasonal, monthly, and hourly predictors collectively explain a substantial proportion of the variance in parking ticket counts. The results suggest that the number of parking tickets varies depending on the time of year, month, and hour of day. Parking infractions are most likely issued during the fall season in October during the morning and mid-day hours, and least likely during winter months around late evening or early morning hours. This is likely due to most enforcement officers typically scheduled to work during the day, and the starting school commute season in September and October. 
 
-# 
+<div style="page-break-after: always"></div>
 
 # **3\. Infraction Types**
 
@@ -329,7 +333,7 @@ Chi-Squared by Infraction code result:
 The degree of freedom changed from 464 to 220, the degrees of freedom were reduced by more than half, which means that in the previous test, R essentially separated almost all infraction types between 2008 and 2024 into distinct categories. This greatly explains why the chi-squared value ended up being so large.  
 However, even with the new results, we can still come to the same conclusion: **the infraction distribution between 2008 is significantly different from 2024\.**
 
-## 
+<div style="page-break-after: always"></div>
 
 # **4\. Location and other influencing characteristics**
 
@@ -450,6 +454,8 @@ Areas with dense commercial activity or major institutions tend to issue large v
 Overall, the results support the conclusion that parking enforcement in Toronto is neither random nor uniform, but is fundamentally structured by the geography and operational needs of the city.  
 The descriptive patterns above suggest strong spatial and temporal structure in ticketing. To formally assess whether these differences are statistically significant, we apply several inferential methods.
 
+<div style="page-break-after: always"></div>
+
 # **Summary and Conclusions**
 
 In this study, we presented the distribution of parking infractions within the City of Toronto from 2008 to 2024, exploring the issued tickets and their associated location and fee. Results show that wards in the downtown region issue the largest share of tickets with smaller violation penalties compared to Toronto residential areas. Vehicles parked on major streets in the downtown region are more likely to be fined. With a Chi-square test, we observe that the annual average fines increase per year, with the most common infraction type as vehicles parked in prohibited areas. This is likely due to the influx of vehicles per year, and the strict street parking limitations around the downtown core. Comparing 2008 to 2024’s average infractions support this speculation, where results suggest that the two means change significantly between the two years. Using a linear regression model, we determined that parking tickets are 1.8 times more likely to be issued during the autumn season between the hours of 9am to 2pm exclusively.
@@ -461,6 +467,8 @@ The City of Toronto dataset is limited to fields permitted for public release. C
 ## Code and data availability
 
 The parking ticket data used in this study are freely available through the City of Toronto site [https://open.toronto.ca/dataset/parking-tickets/](https://open.toronto.ca/dataset/parking-tickets/) (last access: 20 November 2025). The Address Points dataset and ward dataset used for geocoding are publicly available through the City of Toronto sites https://open.toronto.ca/dataset/address-points-municipal-toronto-one-address-repository/ (last access: 20 November 2025\) and https://open.toronto.ca/dataset/city-wards/ (last access: 20 November 2025). All Python and R code used to create any of the figures and/or to create the underlying data is available at https://github.com/AshZein/STA304-Project.
+
+<div style="page-break-after: always"></div>
 
 # **Appendix**
 
