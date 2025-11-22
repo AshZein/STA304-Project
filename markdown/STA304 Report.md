@@ -164,7 +164,7 @@ The distribution of infractions by season can also be observed through condition
 ![image](figures/figure_2_3.png)  
 **Figure 2.3:** Conditional percentages of tickets by season for 2008-2024.
 
-Across the 2008-2024 period, the seasonal distribution of tickets is generally consistent with the overall marginal percentages (Figure 4), with fall and summer accounting for the largest share of tickets, and winter the smallest. Exceptions occur during 2020 and 2021, likely reflecting pandemic-related changes, where the frequency of infractions increased in fall  (\~39%), and spring tickets dropped sharply to about 9-12%. 
+Across the 2008-2024 period, the seasonal distribution of tickets is generally consistent with the overall marginal percentages (Figure 2.2), with fall and summer accounting for the largest share of tickets, and winter the smallest. Exceptions occur during 2020 and 2021, likely reflecting pandemic-related changes, where the frequency of infractions increased in fall  (\~39%), and spring tickets dropped sharply to about 9-12%. 
 
 Overall, ticket counts show clear seasonal variation, with fall and summer consistently accounting for the largest frequencies. In contrast, average and median fine amounts remain relatively uniform across seasons. 
 
@@ -194,10 +194,10 @@ From the summary statistics, the mean fine amount does not vary significantly ac
 
 Since the outcome of interest is a discrete variable, we employ Poisson regression, a standard generalized linear model for count data. Poisson regression assumes that the log of the expected count is a linear function of the predictors, where:
 
-log(E(Y)) \= 0+1X1+2X2+ ...
+log(E(Y)) \= β<sub>0</sub>+β<sub>1</sub>X<sub>1</sub>+β<sub>2</sub>X<sub>2</sub>+ ...
 
 * Y \= the daily or aggregated ticket count,  
-* X1,X2, ... \= temporal predictors (season, month, hour).
+* X<sub>1</sub>,X<sub>2</sub>, ... \= temporal predictors (season, month, hour).
 
 To perform this analysis, tickets were aggregated by season, month, and hour depending on the model. We then fit a Poisson regression of the form: ticket\_count \~ C(season) \+ month \+ hour. The baselines for each temporal variable are fixed to the fall season, January (month 1), and midnight (hour 0\) respectively. This approach provides coefficient estimates, significance tests, and goodness-of-fit metrics that indicate whether temporal variables explain observed variation in infraction counts.
 
