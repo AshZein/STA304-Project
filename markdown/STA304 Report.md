@@ -753,7 +753,41 @@ def plot_bar(categories, values, title=None, xlabel=None, ylabel=None, show_mean
     plt.grid(True, color='white', alpha=0.15)
     plt.tight_layout()
     plt.show()
+```
 
+Plotting temporal analysis plots.
+```python
+plot_boxplot(df, category_col='season', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Season', 
+             title='Fine Distribution by Season', xlim=100)
+plot_boxplot(df, category_col='month', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Month', 
+             title='Fine Distribution by Month', xlim=100)
+plot_boxplot(df, category_col='hour', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Hour of Day', 
+             title='Fine Distribution by Hour', xlim=100)
+
+plot_bar(
+    categories=season_summary['season'],
+    values=season_summary['ticket_count'],
+    title='Total Tickets per Season',
+    xlabel='Season',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
+plot_bar(
+    categories=month_summary['month'],
+    values=month_summary['ticket_count'],
+    title='Total Tickets per Month',
+    xlabel='Month',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
+plot_bar(
+    categories=hour_summary['hour'],
+    values=hour_summary['ticket_count'],
+    title='Total Tickets per Hour',
+    xlabel='Hour',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
 ```
 
 ## Appendix C: Ward Analysis
@@ -864,7 +898,7 @@ import pandas as pd
 import numpy as np
 from utils import *
 import sys
-sys.path.append('C:/Users/jilli/OneDrive/Documents/UofT/Courses/sta304/group_proj/STA304-Project-1/stats_analysis/ash')
+sys.path.append('C:.../sta304/group_proj/STA304-Project-1/stats_analysis/ash')
 from graphics import *
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -927,44 +961,6 @@ counts = df.groupby(['hour', 'infraction_description']).size()
 top_each_season = counts.groupby(level=0).idxmax().reset_index(name='top_infraction')
 top_each_season['count'] = counts.loc[top_each_season['top_infraction']].values
 print(top_each_season)
-
-
-# FIGURES
-
-from plot import *
-
-plot_boxplot(df, category_col='season', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Season', 
-             title='Fine Distribution by Season', xlim=100)
-plot_boxplot(df, category_col='month', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Month', 
-             title='Fine Distribution by Month', xlim=100)
-plot_boxplot(df, category_col='hour', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Hour of Day', 
-             title='Fine Distribution by Hour', xlim=100)
-
-plot_bar(
-    categories=season_summary['season'],
-    values=season_summary['ticket_count'],
-    title='Total Tickets per Season',
-    xlabel='Season',
-    ylabel='Ticket Count',
-    show_mean_sd=False
-)
-plot_bar(
-    categories=month_summary['month'],
-    values=month_summary['ticket_count'],
-    title='Total Tickets per Month',
-    xlabel='Month',
-    ylabel='Ticket Count',
-    show_mean_sd=False
-)
-plot_bar(
-    categories=hour_summary['hour'],
-    values=hour_summary['ticket_count'],
-    title='Total Tickets per Hour',
-    xlabel='Hour',
-    ylabel='Ticket Count',
-    show_mean_sd=False
-)
-
 ```
 
 Statistical test (regression).
@@ -992,7 +988,437 @@ print(model.summary())
 ```
 
 ## Appendix E: Infraction Types and Year Analysis
+```R
+---
+title: "Parking Infraction 2008-2024"
+author: "Ronny Chen"
+date: "2025-11-20"
+output: html_document
+---
 
+{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo   = TRUE,
+  message = TRUE,
+  warning = FALSE
+)
+
+library(data.table)
+library(ggplot2)
+
+
+
+{r load data}
+files <- list.files("tickets", pattern = "\\.csv$", full.names = TRUE)
+
+all_years <- rbindlist(lapply(files, function(f) {
+
+  year <- as.integer(gsub("[^0-9]", "", basename(f)))
+  message("Processing file: ", f, "   Year detected: ", year)
+
+  # Read both infraction_code and infraction_description
+  dt <- fread(f, select = c("infraction_code", "infraction_description"))
+
+  # Count # of tickets by code 
+  yearly_summary <- dt[, .N, by = .(infraction_code, infraction_description)]
+
+  yearly_summary[, year := year]
+
+  return(yearly_summary)
+}))
+
+# Preview of the first few rows, just to see if it is the desired table
+preview_all_years <- head(all_years)
+knitr::kable(
+  preview_all_years,
+  col.names = c("Infraction Code", "Infraction Description", "Ticket Count", "Year"),
+  caption = "Sample of Combined Parking Ticket Data"
+)
+
+
+
+
+
+{r table: avg. tickets per infraction}
+# -----------------------------------------------------------
+# Calculate average tickets per infraction (full period)
+# -----------------------------------------------------------
+
+# Extract the list of unique years
+years <- sort(unique(all_years$year))
+
+# Count how many years are included (2008–2024)
+n_years <- length(years)
+
+# 1) Total tickets per infraction across all years
+summary_infraction <- all_years[
+  ,
+  .(total_tickets = sum(N)),
+  by = infraction_description
+]
+
+# 2) Average tickets per year over full period
+summary_infraction[
+  ,
+  avg_tickets_per_year_full_period := total_tickets / n_years
+]
+
+# 3) Sort from highest total to lowest
+summary_infraction <- summary_infraction[order(-total_tickets)]
+
+# Create a nicely formatted preview table (top 10 rows)
+summary_preview <- head(summary_infraction, 10)
+
+# Display as a clean HTML/LaTeX table
+knitr::kable(
+  summary_preview,
+  col.names = c(
+    "Infraction Description",
+    "Total Tickets (2008–2024)",
+    "Avg Tickets Per Year"
+  ),
+  caption = "Summary of Parking Infractions: Total and Average Yearly Tickets (Top 10)"
+)
+
+
+
+
+{r adding proportions to the table}
+
+summary_infraction[
+  ,
+  proportion := total_tickets / sum(total_tickets)
+]
+
+
+combined_table <- summary_infraction[
+  order(-avg_tickets_per_year_full_period),   # sort by highest average
+  .(
+    infraction_description,
+
+    
+    avg_tickets_per_year =
+      format(
+        round(avg_tickets_per_year_full_period, 2),
+        big.mark = ",",
+        nsmall = 2
+      ),
+
+    
+    proportion =
+      scales::percent(proportion, accuracy = 0.1)
+  )
+]
+
+
+combined_preview <- head(combined_table, 10)
+
+
+knitr::kable(
+  combined_preview,
+  col.names = c(
+    "Infraction Description",
+    "Avg Tickets Per Year",
+    "Proportion of All Tickets"
+  ),
+  caption = "Top 10 Parking Infractions: Average Tickets Per Year and Proportion of Total Tickets"
+)
+
+
+{r bottom10-average}
+
+bottom10 <- summary_infraction[
+  order(avg_tickets_per_year_full_period)][1:10]
+
+bottom10_table <- bottom10[
+  ,
+  .(
+    infraction_description,
+    avg_tickets_per_year =
+      format(
+        round(avg_tickets_per_year_full_period, 2),  # use more precision (they're tiny)
+        big.mark = ",",
+        nsmall = 4
+      ),
+    proportion =
+      scales::percent(proportion, accuracy = 0.1)
+  )
+]
+
+knitr::kable(
+  bottom10_table,
+  col.names = c(
+    "Infraction Description",
+    "Avg Tickets Per Year",
+    "Proportion of All Tickets"
+  ),
+  caption = "Bottom 10 Parking Infractions: Smallest Average Tickets Per Year"
+)
+
+
+
+{r pie chart showing the average proportion of each infraction from 2008-2024}
+# -----------------------------------------------------------
+# Pie chart of top 10 infractions with percentage shown
+# -----------------------------------------------------------
+
+
+
+
+# Total tickets by code
+summary_code <- all_years[
+  ,
+  .(total_tickets = sum(N)),
+  by = infraction_code
+]
+
+# Proportion for each code
+summary_code[
+  ,
+  proportion := total_tickets / sum(total_tickets)
+]
+
+# Top 10 + others
+top10 <- summary_code[order(-proportion)][1:10]
+others_prop <- 1 - sum(top10$proportion)
+
+pie_data <- rbind(
+  top10[, .(infraction_code, proportion)],
+  data.table(infraction_code = "Others", proportion = others_prop)
+)
+
+# Pie chart
+ggplot(pie_data,
+       aes(x = "", y = proportion, fill = infraction_code)) +
+  geom_col(width = 1) +
+  coord_polar(theta = "y") +
+  theme_void() +
+  labs(
+    title = "Top 10 Parking Infractions by Code (Proportion)",
+    fill = "Infraction Code"
+  )
+
+
+
+
+{r pie-chart-description-with-others, fig.width=8, fig.height=8}
+library(data.table)
+library(ggplot2)
+library(scales)
+
+code_map <- data.table(
+  infraction_code = c("2", "207", "210", "29", "3", "403", "5", "6", "8", "9"),
+  description = c(
+    "PARK LONGER THAN 3 HOURS",
+    "FAIL TO DEPOSIT FEE (MACHINE)",
+    "FAIL TO DISPLAY RECEIPT",
+    "PARK PROHIBITED TIME – NO PERMIT",
+    "PARK / LEAVE ON PRIVATE PROPERTY",
+    "STOP-SIGNED HIGHWAY – RUSH HOUR",
+    "PARK PROHIBITED TIMES / DAYS",
+    "PARK IN EXCESS OF PERMITTED TIME",
+    "STAND PROHIBITED TIMES / DAYS",
+    "STOP PROHIBITED TIMES / DAYS"
+  )
+)
+
+summary_code <- all_years[
+  ,
+  .(total_tickets = sum(N)),
+  by = infraction_code
+]
+
+summary_code[, infraction_code := as.character(infraction_code)]
+
+summary_code[
+  ,
+  proportion := total_tickets / sum(total_tickets)
+]
+
+top10_codes <- summary_code[order(-proportion)][1:10]
+
+pie_top10 <- merge(
+  top10_codes,
+  code_map,
+  by = "infraction_code",
+  all.x = TRUE
+)
+
+pie_top10[
+  is.na(description),
+  description := paste0("CODE ", infraction_code)
+]
+
+others_prop <- 1 - sum(pie_top10$proportion)
+
+pie_data <- rbind(
+  pie_top10[, .(description, proportion)],
+  data.table(description = "OTHERS", proportion = others_prop)
+)
+
+pie_data[
+  ,
+  legend_label := paste0(
+    description,
+    " (",
+    scales::percent(proportion, accuracy = 0.1),
+    ")"
+  )
+]
+
+ggplot(pie_data,
+       aes(x = "", y = proportion, fill = legend_label)) +
+  geom_col(width = 1) +
+  coord_polar(theta = "y") +
+  theme_void() +
+  labs(
+    title = "Top 10 Parking Infractions (With Others)",
+    fill = ""
+  )
+
+
+
+
+
+
+
+
+
+
+{r Bar Chart for top 10 average infractions}
+# -----------------------------------------------------------
+# Plot the Top 10 infractions ranked by their average number
+# of tickets issued per year (2008–2024).
+# -----------------------------------------------------------
+top10 <- summary_infraction[order(-avg_tickets_per_year_full_period)][1:10]
+
+ggplot(top10,
+       aes(x = reorder(infraction_description, avg_tickets_per_year_full_period),
+           y = avg_tickets_per_year_full_period)) +
+  geom_col() +
+  geom_text(
+    aes(label = format(
+      round(avg_tickets_per_year_full_period, 2),
+      big.mark = ",",
+      nsmall = 2
+    )),
+    hjust = -0.1,
+    size = 3.8
+  ) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Parking Infractions — Average Tickets Per Year",
+    x = "Infraction Description",
+    y = "Average Tickets Per Year"
+  ) +
+  ylim(0, max(top10$avg_tickets_per_year_full_period) * 1.15)
+
+
+{r top10 most frequent infraction for 2008 and 2024}
+
+# ---- 2008 ----
+inf_2008 <- all_years[year == 2008,
+                      .(total_2008 = sum(N)),
+                      by = infraction_description]
+
+total_2008_sum <- sum(inf_2008$total_2008)
+
+inf_2008 <- inf_2008[
+  ,
+  proportion_2008 := total_2008 / total_2008_sum
+][order(-total_2008)][1:10]
+
+inf_2008_print <- inf_2008[
+  ,
+  .(
+    infraction_description,
+    total_2008 = format(total_2008, big.mark = ","),
+    proportion_2008 = scales::percent(proportion_2008, accuracy = 0.1)
+  )
+]
+
+
+# ---- 2024 ----
+inf_2024 <- all_years[year == 2024,
+                      .(total_2024 = sum(N)),
+                      by = infraction_description]
+
+total_2024_sum <- sum(inf_2024$total_2024)
+
+inf_2024 <- inf_2024[
+  ,
+  proportion_2024 := total_2024 / total_2024_sum
+][order(-total_2024)][1:10]
+
+inf_2024_print <- inf_2024[
+  ,
+  .(
+    infraction_description,
+    total_2024 = format(total_2024, big.mark = ","),
+    proportion_2024 = scales::percent(proportion_2024, accuracy = 0.1)
+  )
+]
+
+
+# ---- Output Tables ----
+knitr::kable(
+  inf_2008_print,
+  col.names = c("Infraction Description", "Total Tickets", "Proportion"),
+  caption = "Top 10 Parking Infractions in 2008"
+)
+
+knitr::kable(
+  inf_2024_print,
+  col.names = c("Infraction Description", "Total Tickets", "Proportion"),
+  caption = "Top 10 Parking Infractions in 2024"
+)
+
+
+
+
+
+{r chi-square using infraction description}
+# -----------------------------------------------------------
+# Chi-Square Test of Association
+#
+# Goal:
+#   Determine whether the distribution of parking infraction
+#   types in 2008 is significantly different from the
+#   distribution in 2024.
+#
+# Why this test?
+#   • Both variables (year and infraction type) are categorical.
+#   • We want to compare the pattern of ticket counts across years.
+#   • Chi-square tests whether differences are due to chance.
+# -----------------------------------------------------------
+table_2008_2024 <- all_years[year %in% c(2008, 2024),
+                             .(N = sum(N)),
+                             by = .(year, infraction_description)]
+
+# reshape to wide
+contingency <- dcast(table_2008_2024,
+                     infraction_description ~ year,
+                     value.var = "N",
+                     fill = 0)
+
+# run chi-square
+chisq.test(contingency[, -1])
+
+
+{r chi-squared using infraction code}
+table_code_2008_2024 <- all_years[year %in% c(2008, 2024),
+                                  .(N = sum(N)),
+                                  by = .(year, infraction_code)]
+
+contingency_code <- dcast(
+  table_code_2008_2024,
+  infraction_code ~ year,
+  value.var = "N",
+  fill = 0
+)
+
+chisq.test(contingency_code[, -1])
+```
 
 ## Appendix F: Average Fine Influencing Characteristics
 ```R
