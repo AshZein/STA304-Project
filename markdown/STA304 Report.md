@@ -3,6 +3,7 @@
 # **A Quantitative Study on the Frequency and Distribution of Parking Tickets**
 
 ## Hannah De Guzman, Ashkan Zeinolabedini, Bahaa Al Jalam, Ronny Chen
+<div style="page-break-after: always"></div>
 
 # **Abstract**
 
