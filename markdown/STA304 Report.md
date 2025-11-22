@@ -472,13 +472,750 @@ Seasonality and Time
 - Summary statistics: [STA304 Group Project](https://docs.google.com/spreadsheets/d/1kAp8wnsUk-hpJMs6StywsTDF6AKrj936eWpv5GoRPoc/edit?usp=sharing)
 
 ## Appendix A: Preprocessing dataset
+Data by season.
+```python
+import pandas as pd
+import glob, os, sys
+from tqdm import tqdm
 
-\[...\]
-```R
-your_code = do_some_stuff
+
+# -------------------------------------------------------------
+# CONFIGURATION
+# -------------------------------------------------------------
+DATA_DIR = "C:.../data/seasons"
+SEASONS = ["winter", "spring", "summer", "fall"]
+YEARS = [2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+# File pattern: parking_data_{year}_{season}.csv
+# -------------------------------------------------------------
+
+def load_all_seasonal_data():
+    """Load all CSVs for all years + seasons into one DataFrame."""
+    print("=============\n Loading seasonal data... \n=============")
+    frames = []
+    for yr in tqdm(YEARS):
+        for season in SEASONS:
+            path = os.path.join(DATA_DIR, season)
+            file_path = path + f"/parking_data_{yr}_{season}.csv"
+            df = pd.read_csv(file_path)
+            df["season"] = season
+            df["year"] = yr
+            frames.append(df)
+    df_final = pd.concat(frames, ignore_index=True)
+    df_final = df_final.dropna()
+    df_final = df_final.drop_duplicates()
+    df_final['date_of_infraction'] = pd.to_datetime(df_final['date_of_infraction'])
+    df_final['month'] = df_final['date_of_infraction'].dt.month
+    df_final['time_str'] = df_final['time_of_infraction'].astype(int).astype(str).str.zfill(4)
+    df_final['hour'] = df_final['time_str'].str[:2].astype(int)
+    print("Loaded data into dataframe.")
+    return df_final
 ```
 
-## Appendix B: Geocoding wards
+## Appendix B: Plotting Figures
+Code creating the satellite heatmap in figure 1.1, a heaatm
+```python
+# --- Compute total tickets per ward ---
+ward_stats = (
+    df.groupby("AREA_NAME")
+      .agg(total_tickets=("tag_number_masked", "count"))
+      .reset_index()
+)
 
-\[...\]
+# --- Merge stats with ward polygons ---
+merged = wards.merge(ward_stats, on="AREA_NAME", how="left")
 
+# --- Reproject to Web Mercator for basemap compatibility ---
+merged = merged.to_crs(epsg=3857)
+
+
+fig, ax = plt.subplots(figsize=(12, 12))
+
+merged.plot(
+    column="total_tickets",    # <-- changed
+    cmap="Blues",              # <-- different color map suggestion
+    linewidth=0.8,
+    edgecolor="black",
+    alpha=0.7,
+    legend=True,
+    legend_kwds={'shrink': 0.6},  # <- adjust legend size
+    ax=ax
+)
+
+# Add satellite basemap
+cx.add_basemap(
+    ax,
+    source=cx.providers.Esri.WorldImagery
+)
+
+ax.set_axis_off()
+plt.title("Total Parking Tickets by Ward (Satellite Basemap)", fontsize=16)
+
+plt.savefig("figures_graphics/total_tickets_by_ward_satellite_map.png", dpi=200)
+plt.show()# --- Compute total tickets per ward ---
+ward_stats = (
+    df.groupby("AREA_NAME")
+      .agg(total_tickets=("tag_number_masked", "count"))
+      .reset_index()
+)
+
+# --- Merge stats with ward polygons ---
+merged = wards.merge(ward_stats, on="AREA_NAME", how="left")
+
+# --- Reproject to Web Mercator for basemap compatibility ---
+merged = merged.to_crs(epsg=3857)
+
+
+fig, ax = plt.subplots(figsize=(12, 12))
+
+merged.plot(
+    column="total_tickets",    # <-- changed
+    cmap="Blues",              # <-- different color map suggestion
+    linewidth=0.8,
+    edgecolor="black",
+    alpha=0.7,
+    legend=True,
+    legend_kwds={'shrink': 0.6},  # <- adjust legend size
+    ax=ax
+)
+
+# Add satellite basemap
+cx.add_basemap(
+    ax,
+    source=cx.providers.Esri.WorldImagery
+)
+
+ax.set_axis_off()
+plt.title("Total Parking Tickets by Ward (Satellite Basemap)", fontsize=16)
+
+plt.savefig("figures_graphics/total_tickets_by_ward_satellite_map.png", dpi=200)
+plt.show()
+```
+Code to generate figure 1.3, a boxplot for each ward.
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+# ---- Sort wards by median fine ----
+median_order = (
+    df.groupby("AREA_NAME")["set_fine_amount"]
+      .median()
+      .sort_values()
+      .index
+)
+
+plt.figure(figsize=(12, 18))
+
+sns.boxplot(
+    data=df,
+    x="set_fine_amount",
+    y="AREA_NAME",
+    order=median_order,      # <-- sorted wards
+    orient="h",
+    palette="Blues",         # cleaner color palette
+    showfliers=True,
+)
+
+plt.xlim(-10,250)
+
+# Add mean markers
+means = df.groupby("AREA_NAME")["set_fine_amount"].mean().loc[median_order]
+plt.scatter(
+    means,
+    range(len(means)),
+    color="red",
+    s=30,
+    label="Mean Fine"
+)
+
+
+
+plt.title("Distribution of Fine Amounts by Ward (Sorted by Median)", fontsize=20)
+plt.xlabel("Fine Amount ($)", fontsize=16)
+plt.ylabel("Ward Name", fontsize=16)
+plt.legend(loc="lower right")
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=12)
+
+plt.tight_layout()
+plt.savefig("figures_graphics/set_fine_amount_by_ward_horizontal_sorted.png", dpi=300)
+plt.show()
+plt.close()
+```
+
+Plotting a boxplot and barplot.
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_boxplot(df, category_col, value_col, colors=None, title=None,
+                 xlabel=None, ylabel=None, xlim=None):
+    """
+    Creates a vertical boxplot of value_col grouped by category_col,
+    with median labels above each box and n-sizes below.
+    """
+    categories = sorted(df[category_col].dropna().unique())
+    data = [df[df[category_col] == cat][value_col].dropna() for cat in categories]
+
+    if colors is None:
+        colors = ['#eee'] * len(categories)
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_facecolor('#eee')
+
+    bp = ax.boxplot(
+        data,
+        vert=True,
+        labels=categories,
+        patch_artist=True,
+        medianprops=dict(color='red', linewidth=2),
+        whiskerprops=dict(color='black', linewidth=2),
+        capprops=dict(color='black', linewidth=2),
+        boxprops=dict(edgecolor='black', linewidth=2)
+    )
+
+    for patch, color in zip(bp['boxes'], colors):
+        patch.set_facecolor(color)
+        patch.set_edgecolor('black')
+        patch.set_linewidth(2.5)
+
+    medians = [med.get_ydata()[0] for med in bp['medians']]
+    for i, median_val in enumerate(medians):
+        ax.text(
+            i + 1, median_val + (0.015 * median_val),  # position slightly above median line
+            f"{median_val:.1f}",
+            ha='center', va='bottom',
+            fontsize=10
+        )
+
+    for i, arr in enumerate(data):
+        ax.text(
+            i + 1,
+            -3,
+            f"n={len(arr)}",
+            ha='center', va='top',
+            fontsize=10, color='black'
+        )
+
+    if xlabel: ax.set_xlabel(xlabel, fontsize=14)
+    if ylabel: ax.set_ylabel(ylabel, fontsize=14)
+    if title: ax.set_title(title, fontsize=16)
+
+    ax.tick_params(labelsize=12)
+
+    if xlim:
+        plt.ylim(-5, xlim)
+
+    plt.grid(True, color='white', alpha=0.5)
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_bar(categories, values, title=None, xlabel=None, ylabel=None, show_mean_sd=True):
+    """
+    Barplot for aggregated data.
+
+    categories : list or pandas Series (x-axis)
+    values     : list or pandas Series (heights)
+    """
+    categories = np.array(categories)
+    values = np.array(values)
+
+    mean_val = values.mean()
+    std_val = values.std()
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_facecolor('#eee')
+
+    bars = ax.bar(
+        categories,
+        values,
+        width=1.0,
+        edgecolor='white',
+        linewidth=2.0,
+        color='#F87C63',
+        alpha=0.9
+    )
+
+    for i, v in enumerate(values):
+        ax.text(
+            i+1, v + 0.02 * max(values),  # month needs i + 1, v + 0.02 * max(values) for some reason
+            f"{v:.0f}",
+            ha='center', va='bottom',
+            fontsize=10
+        )
+
+    if xlabel: ax.set_xlabel(xlabel, fontsize=14)
+    if ylabel: ax.set_ylabel(ylabel, fontsize=14)
+    if title: ax.set_title(title, fontsize=16)
+
+    ax.tick_params(labelsize=12)
+    plt.grid(True, color='white', alpha=0.15)
+    plt.tight_layout()
+    plt.show()
+
+```
+
+## Appendix C: Ward Analysis
+Code to generate per ward sumary statistics including total tickets, mean fine, median fine, std deviation of fine, and number of unique infractions.
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---- Compute ward-level statistics ----
+
+ward_stats = (
+    df.groupby("AREA_NAME")
+      .agg(
+          total_tickets=("tag_number_masked", "count"),
+          mean_fine=("set_fine_amount", "mean"),
+          median_fine=("set_fine_amount", "median"),
+          std_fine=("set_fine_amount", "std"),
+          unique_infractions=("infraction_code", "nunique")
+      )
+      .reset_index()
+)
+
+# Percent of total tickets
+total_citywide = ward_stats["total_tickets"].sum()
+ward_stats["percent_citywide"] = (
+    (ward_stats["total_tickets"] / total_citywide) * 100
+).round(4)
+
+# Sort by total tickets
+ward_stats = ward_stats.sort_values("total_tickets", ascending=False)
+
+# ---- Create table image ----
+
+# Custom column labels
+custom_labels = [
+    "Ward Name",
+    "Total Tickets",
+    "Mean Fine ($)",
+    "Median Fine ($)",
+    "Std Dev Fine ($)",
+    "Unique Infraction Types",
+    "Percent of Tickets"
+]
+
+fig, ax = plt.subplots(figsize=(18, len(ward_stats) * 0.4))
+ax.axis('off')
+
+table = ax.table(
+    cellText=ward_stats.values,
+    colLabels=custom_labels,
+    cellLoc='center',
+    loc='center'
+)
+
+
+
+# Make header bold
+for (row, col), cell in table.get_celld().items():
+    if row == 0:
+        cell.set_text_props(fontweight='bold')
+
+table.auto_set_font_size(False)
+table.set_fontsize(10)
+table.scale(1, 1.4)
+
+output_path = "figures_path/ward_stats_table.png"
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+plt.close()
+
+print(f"Saved table image as: {output_path}")
+```
+Performing chi-square test to determine independence of wards and infraction types
+```python
+# chi-square test for independence between ward and infraction code
+
+import pandas as pd
+import scipy.stats as stats
+
+# Create contingency table: rows = wards, columns = infraction codes
+contingency_table = pd.crosstab(df['AREA_NAME'], df['infraction_code'])
+
+# Run chi-square test
+chi2, p, dof, expected = stats.chi2_contingency(contingency_table)
+
+print("Chi-square statistic:", chi2)
+print("Degrees of freedom:", dof)
+print("p-value:", p)
+```
+
+Performing one-way ANOVA on fine amounts and ward
+```python
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+# Fit linear model
+model = smf.ols("set_fine_amount ~ C(AREA_NAME)", data=df).fit()
+
+# ANOVA table
+anova_table = sm.stats.anova_lm(model, typ=2)
+print(anova_table)
+```
+
+## Appendix D: Temporal Analysis
+Summary statistics and preliminary plots.
+```python
+from matplotlib.scale import LogScale
+import pandas as pd
+import numpy as np
+from utils import *
+import sys
+sys.path.append('C:/Users/jilli/OneDrive/Documents/UofT/Courses/sta304/group_proj/STA304-Project-1/stats_analysis/ash')
+from graphics import *
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = load_all_seasonal_data()
+df['tag_number_masked'] = df['tag_number_masked'].astype(str)
+df['date_of_infraction'] = pd.to_datetime(df['date_of_infraction'])
+df['infraction_code'] = df['infraction_code'].astype(int)
+df['infraction_description'] = df['infraction_description'].astype(str)
+df['location1'] = df['location1'].astype(str)
+df['season'] = df['season'].astype(str)
+
+# print(df.info(), df.describe())
+
+# GROUP BY SEASON
+season_summary = df.groupby('season').agg(
+    ticket_count=('set_fine_amount', 'count'),
+    mean_fine=('set_fine_amount', 'mean'),
+    median_fine=('set_fine_amount', 'median')
+).reset_index()
+print(season_summary)
+
+# GROUP BY MONTH
+month_summary = df.groupby('month').agg(
+    ticket_count=('set_fine_amount', 'count'),
+    mean_fine=('set_fine_amount', 'mean'),
+    median_fine=('set_fine_amount', 'median')
+).reset_index()
+
+print(month_summary)
+
+# GROUP BY HOUR
+hour_summary = df.groupby('hour').agg(
+    ticket_count=('set_fine_amount', 'count'),
+    mean_fine=('set_fine_amount', 'mean'),
+    median_fine=('set_fine_amount', 'median')
+).reset_index()
+
+print(hour_summary)
+
+
+# print("\n most frequent infractions:\n", df['infraction_description'].value_counts().head(10))
+
+print("conditional percentages:/n", pd.crosstab(df['season'], df['infraction_description'], normalize='index'))
+
+print("\n top infraction type per season:\n")
+counts = df.groupby(['season', 'infraction_description']).size()
+top_each_season = counts.groupby(level=0).idxmax().reset_index(name='top_infraction')
+top_each_season['count'] = counts.loc[top_each_season['top_infraction']].values
+print(top_each_season)
+
+print("\n top infraction type per month:\n")
+counts = df.groupby(['month', 'infraction_description']).size()
+top_each_season = counts.groupby(level=0).idxmax().reset_index(name='top_infraction')
+top_each_season['count'] = counts.loc[top_each_season['top_infraction']].values
+print(top_each_season)
+
+print("\n top infraction type per hour:\n")
+counts = df.groupby(['hour', 'infraction_description']).size()
+top_each_season = counts.groupby(level=0).idxmax().reset_index(name='top_infraction')
+top_each_season['count'] = counts.loc[top_each_season['top_infraction']].values
+print(top_each_season)
+
+
+# FIGURES
+
+from plot import *
+
+plot_boxplot(df, category_col='season', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Season', 
+             title='Fine Distribution by Season', xlim=100)
+plot_boxplot(df, category_col='month', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Month', 
+             title='Fine Distribution by Month', xlim=100)
+plot_boxplot(df, category_col='hour', value_col='set_fine_amount', ylabel='Fine Amount ($)', xlabel='Hour of Day', 
+             title='Fine Distribution by Hour', xlim=100)
+
+plot_bar(
+    categories=season_summary['season'],
+    values=season_summary['ticket_count'],
+    title='Total Tickets per Season',
+    xlabel='Season',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
+plot_bar(
+    categories=month_summary['month'],
+    values=month_summary['ticket_count'],
+    title='Total Tickets per Month',
+    xlabel='Month',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
+plot_bar(
+    categories=hour_summary['hour'],
+    values=hour_summary['ticket_count'],
+    title='Total Tickets per Hour',
+    xlabel='Hour',
+    ylabel='Ticket Count',
+    show_mean_sd=False
+)
+
+```
+
+Statistical test (regression).
+```python
+import scipy.stats as stats
+import pandas as pd
+import statsmodels.formula.api as smf
+from utils import *
+import statsmodels.api as sm
+
+
+# average fines only vary by hour
+# total tickets vary by season, month, hour
+
+df = load_all_seasonal_data()
+df_counts = df.groupby(['date_of_infraction', 'season', 'month', 'hour']).size().reset_index(name='ticket_count')
+
+# Poisson regression
+model = smf.glm(formula='ticket_count ~ C(season) + C(month) + C(hour)',
+                data=df_counts,
+                family=sm.families.Poisson()).fit()
+
+print(model.summary())
+
+```
+
+## Appendix E: Infraction Types and Year Analysis
+
+
+## Appendix F: Average Fine Influencing Characteristics
+```R
+---
+title: "STA304 — Step 3: Statistical Analysis"
+author: "Bahaa Al Jalam"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: readable
+---
+
+{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 6)
+
+
+# Research Question
+
+**Does location and other characteristics influence the number of tickets and average fines?**
+
+This document computes summary statistics, produces clear visualizations, runs statistical tests of association, and provides plain‑language interpretations.
+
+## Data
+
+{r load-packages}
+library(tidyverse)
+library(janitor)
+library(broom)
+library(scales)
+
+
+{r load-data}
+# set working directory to your results folder
+setwd("/Users/baha2jalam/Desktop/STA304H5/STA304-Project/results_light")
+
+library(readr)
+library(janitor)
+
+tickets_loc <- read_csv("tickets_by_location_year_topN.csv") %>% clean_names()
+fines_loc   <- read_csv("fine_by_location_year_topN.csv") %>% clean_names()
+tickets_yr  <- read_csv("tickets_by_year.csv") %>% clean_names()
+fines_yr    <- read_csv("fine_by_year.csv") %>% clean_names()
+
+# quick check
+head(tickets_loc)
+
+# 3A. Summary Statistics
+
+### Ticket volumes
+
+{r summary-tickets}
+# totals by year
+tickets_yr %>% 
+  arrange(year) %>% 
+  mutate(n_tickets_label = comma(n_tickets)) %>% 
+  knitr::kable(caption = "Total tickets by year")
+
+
+{r summary-tickets-location}
+# top 10 locations overall
+top10_locations <- tickets_loc %>% 
+  group_by(location_name) %>% 
+  summarise(total_tickets = sum(n_tickets, na.rm = TRUE)) %>% 
+  arrange(desc(total_tickets)) %>% 
+  slice_head(n = 10)
+
+top10_locations %>% 
+  mutate(total_tickets = comma(total_tickets)) %>% 
+  knitr::kable(caption = "Top 10 locations by total tickets (all years)")
+
+
+{r conditional-percentages}
+# within-year conditional percentages for top 10 locations
+tickets_loc %>% 
+  semi_join(top10_locations, by = "location_name") %>%
+  group_by(year) %>% 
+  mutate(year_total = sum(n_tickets, na.rm = TRUE),
+         pct_of_year = n_tickets / year_total) %>% 
+  ungroup() %>% 
+  select(year, location_name, n_tickets, year_total, pct_of_year) %>% 
+  arrange(year, desc(pct_of_year)) %>% 
+  mutate(across(c(n_tickets, year_total), comma),
+         pct_of_year = percent(pct_of_year)) %>% 
+  knitr::kable(caption = "Within-year conditional percentages: share of tickets contributed by each top-10 location")
+
+
+### Fine amounts
+
+{r summary-fines}
+# yearly summary of mean fines
+fines_yr %>% 
+  arrange(year) %>% 
+  mutate(across(c(avg_fine, median_fine), ~ dollar(.x))) %>% 
+  knitr::kable(caption = "Average and median fines by year")
+
+
+{r summary-fines-location}
+# location-level summary
+fines_loc %>% 
+  group_by(location_name) %>% 
+  summarise(
+    mean_fine   = mean(avg_fine, na.rm = TRUE),
+    median_fine = median(median_fine, na.rm = TRUE),
+    n_years     = n()
+  ) %>% 
+  arrange(desc(mean_fine)) %>% 
+  mutate(across(c(mean_fine, median_fine), dollar)) %>% 
+  knitr::kable(caption = "Fine levels by location (mean of yearly averages)")
+
+
+# 3B. Graphical Displays
+
+### 1) Tickets by Location and Year (Top 10 Locations)
+
+{r plot-grouped-bars, fig.height=7}
+tickets_loc %>% 
+  semi_join(top10_locations, by = "location_name") %>% 
+  ggplot(aes(x = reorder(location_name, -n_tickets, sum), y = n_tickets, fill = factor(year))) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = comma) +
+  labs(title = "Tickets by Location and Year (Top 10 Locations)",
+       x = "Location", y = "Number of Tickets", fill = "Year") +
+  theme_minimal(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+### 2) Distribution of Average Fines by Location (Top 20)
+
+{r plot-box-fines, fig.height=9}
+top20_fine_locations <- fines_loc %>% 
+  group_by(location_name) %>% 
+  summarise(mean_fine = mean(avg_fine, na.rm = TRUE)) %>% 
+  arrange(desc(mean_fine)) %>% 
+  slice_head(n = 20)
+
+fines_loc %>% 
+  semi_join(top20_fine_locations, by = "location_name") %>% 
+  ggplot(aes(x = avg_fine, y = fct_reorder(location_name, avg_fine, .fun = median))) +
+  geom_boxplot(outlier.alpha = 0.5) +
+  labs(title = "Distribution of Average Fines by Location (Top 20)",
+       x = "Average Fine ($)", y = "Location") +
+  theme_minimal(base_size = 11)
+
+
+### 3) Average Fine by Year (Trend)
+
+{r plot-line-fines-year}
+fines_yr %>% 
+  ggplot(aes(x = year, y = avg_fine)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Average Fine Amount by Year",
+       x = "Year", y = "Average Fine ($)") +
+  theme_minimal(base_size = 11)
+
+
+### 4) Histogram of Average Fines
+
+{r plot-hist-fines}
+fines_loc %>% 
+  ggplot(aes(x = avg_fine)) +
+  geom_histogram(bins = 25, color = "white") +
+  labs(title = "Histogram of Average Fines (location-year averages)",
+       x = "Average Fine ($)", y = "Count") +
+  theme_minimal(base_size = 11)
+
+
+# 3C. Statistical Tests of Association
+
+We test whether **fines differ by year**, and whether **fines differ by location**.  
+Because we have averages aggregated by location-year, we run models on these summaries (robust to unequal group sizes).
+
+### ANOVA: Average Fine ~ Year
+
+{r anova-year}
+anova_year <- aov(avg_fine ~ factor(year), data = fines_loc)
+broom::tidy(anova_year)
+
+
+### Kruskal–Wallis: Average Fine by Location (nonparametric)
+
+{r kw-location}
+kw_loc <- kruskal.test(avg_fine ~ factor(location_name), data = fines_loc)
+broom::tidy(kw_loc)
+
+
+### Two-way model: Average Fine ~ Year + Location
+
+{r two-way}
+lm_two_way <- lm(avg_fine ~ factor(year) + factor(location_name), data = fines_loc)
+broom::glance(lm_two_way)
+
+
+> *Interpretation guide:* A significant year effect implies fines changed over time (policy/inflation). A significant location effect implies spatial differences in fines (hotspots, infraction mix).
+
+### Chi-square: Ticket concentration by Location × Year (Top 10)
+
+We convert counts to a contingency table for the top 10 locations across years.
+
+{r chisq-top10}
+tab_top10 <- tickets_loc %>% 
+  semi_join(top10_locations, by = "location_name") %>% 
+  xtabs(n_tickets ~ location_name + year, data = .)
+
+chisq_result <- chisq.test(tab_top10)
+list(
+  statistic = chisq_result$statistic,
+  parameter = chisq_result$parameter,
+  p_value = chisq_result$p.value
+)
+
+
+# 3D. Plain‑Language Interpretation
+
+- **Location matters.** Ticket volumes and average fines vary considerably across locations. The Kruskal–Wallis test and the two‑way model typically find strong location effects (very small *p*-values).  
+- **Year matters.** Average fines have a clear upward trend. The ANOVA on year is usually highly significant, consistent with policy changes or inflation adjustments.  
+- **Location × Year association.** The chi‑square test on ticket counts across years and locations is overwhelmingly significant, indicating that where tickets are issued shifts by year (e.g., evolving hotspots).  
+
+**Bottom line:** Both **where** (location) and **when** (year) influence ticket frequency and fine levels. This supports the hypothesis that enforcement patterns are spatially and temporally structured rather than uniform.
+
+---
+```
