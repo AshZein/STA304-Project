@@ -57,7 +57,7 @@ All records contain complete values as per City of Toronto.
 
 ## 1.1 Introduction
 
-The city of Toronto is divided into regions using a ward system, regional trend and statistical analysis can be performed. Performing this form of analysis illustrates which regions have a higher number of tickets issued, a higher average fine amount, and insight on the types of violations most common within each ward. The analysis is performed on data collected in the year 2024, which is the most recent year available.
+The city of Toronto is divided into regions using a ward system such that regional trends and statistical analysis can be performed. Performing this form of analysis illustrates which regions have a higher number of tickets issued, a higher average fine amount, and insight on the types of violations most common within each ward. The analysis is performed on data collected in the year 2024, which is the most recent year available.
 
 ## 1.2 Methodology
 
