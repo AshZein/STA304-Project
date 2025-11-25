@@ -57,7 +57,7 @@ All records contain complete values as per City of Toronto.
 
 ## 1.1 Introduction
 
-The city of Toronto is divided into regions using a ward system such that regional trends and statistical analysis can be performed. Performing this form of analysis illustrates which regions have a higher number of tickets issued, a higher average fine amount, and insight on the types of violations most common within each ward. The analysis is performed on data collected in the year 2024, which is the most recent year available.
+The city of Toronto is divided into regions using a ward system such that regional trends and statistical analysis can be performed. Performing this form of analysis illustrates which regions have a higher number of tickets issued, a higher average fine amount, and insight on the types of violations most common within each ward. The analysis is performed on data collected in the year 2024, which is the most recent year available. 
 
 ## 1.2 Methodology
 
@@ -66,6 +66,8 @@ The original dataset lacked ward information, and so the ticket data was geocode
 When performing regional data and statistical analysis, heatmaps are an excellent way to visually compare regions and spot trends in the dataset. A heatmap representing the total tickets issued in each ward and another map representing the average fine in each ward is. These two maps show interesting patterns and clustering of fine amounts. 
 
 Box plots are another statistical tool which visualizes the spread in the data points. Creating a boxplot for each ward based on the fine amounts provides insight on the spread of the fine amounts within the ward. Indicating which wards have a large amount and which ones have a small amount of spread. Boxplots indicate where the fine amounts are most concentrated (higher fines mostly, lower fines, or an even spread).
+
+<div style="page-break-after: always"></div>
 
 ## 1.3 Regional Analysis (wards)
 
@@ -84,13 +86,18 @@ The ward with the highest average fine amount is Willowdale, while the remaining
 Both maps demonstrate that there is no positive correlation between the total number of tickets issued and the severity of the fines. Downtown wards issue the highest volume of tickets issued, yet their average fine amounts are relatively low. The most common infraction type downtown involves parking machine violations, such as unpaid fees, expired receipts, or permits not displayed correctly. These kinds of infractions are generally lower fines, but given in higher volumes.  
 In contrast, Willowdale issues fewer tickets, but a high number of high value tickets are issued. The most common infraction in this ward includes rush-hour violations, No-stopping zones, and transit stop standing, which all have much higher penalties. Willowdale’s infractions are skewed to being more high-value tickets.
 
+<div style="page-break-after: always"></div>
+
 ### 1.3.2 Spread in fines issued per ward
 
-![image](figures/figure_1_3.png)  
+<!-- ![image](figures/figure_1_3.png)   -->
+<img src="figures/figure_1_3.png" alt="image" width="500"/>
+
 **Figure 1.3:** Box plots of the fine amounts for each ticket issued in each ward
 
 This boxplot showcases that the spread in fine amounts differs drastically amongst the wards. Some wards have a tighter cluster of fines, indicating the fines given are more close in value, some wards have a large spread, meaning that a wider variety of infraction types are given in these wards.   
 	
+<div style="page-break-after: always"></div>
 
 ### 1.3.3 Per ward summary statistics
 
@@ -98,6 +105,8 @@ This boxplot showcases that the spread in fine amounts differs drastically among
 **Figure 1.4:** Summary Statistics (1/2) including total counts, unique infraction types, and proportion of city wide tickets  
 **![image](figures/figure_1_5.jpeg)**  
 **Figure 1.5:** Summary Statistics (2/2) including the Mean, median and standard deviation of fines within each ward
+
+<div style="page-break-after: always"></div>
 
 ## 1.4 Statistical Tests
 
@@ -149,16 +158,22 @@ Temporal variables were derived from the existing *date\_of\_infraction* and *ti
 Tickets were aggregated across these temporal dimensions to create a dataset of ticket counts. The dependent variable in the analysis was *ticket\_count*, representing the number of tickets per aggregation unit, while the independent variables were *season*, *month*, and *hour*. This structure allowed for examination of whether ticket issuance exhibited systematic variation according to seasonality, monthly trends, and daily cycles.  
 For inferential analysis, a Poisson regression model was employed using Python’s statsmodels library. This approach is appropriate for count data and models the relationship between ticket counts and temporal predictors while accounting for the non-negative and discrete nature of the dependent variable. Coefficients were interpreted as log-rate changes in ticket counts relative to reference categories.
 
+<div style="page-break-after: always"></div>
+
 ## 2.3 Results
 
 Before performing regression analyses, we examined the aggregate characteristics of parking infractions across season, month, and hour. The dataset included over 2 million parking infractions aggregated across multiple years, seasons, months, and hours of day. Initial descriptive analyses revealed clear temporal variation in ticketing patterns. To formally assess whether ticket counts were associated with temporal variables, a Poisson regression model was fit with season, month, and hour of day as predictors.
 
 ### 2.3.1 Seasonal summary 
 
-![image](figures/figure_2_1.png)  
+<!-- ![image](figures/figure_2_1.png)   -->
+<img src="figures/figure_2_1.png" alt="image" style="width:70%;"/>
+
 **Figure 2.1:** Fine amount distribution by season.
 
-![image](figures/figure_2_2.png)  
+<!-- ![image](figures/figure_2_2.png)   -->
+<img src="figures/figure_2_2.png" alt="image" style="width:70%;"/>
+
 **Figure 2.2:** Ticket frequency by season.
 
 The total number of parking tickets varied across seasons, with fall accounting for the largest share of infractions (593,182 tickets, 27.97% of the marginal annual total) and winter the fewest (462,342 tickets, 21.81% marginal). Summer and spring accounted for approximately 27% and 24% of the tickets, respectively. The mean set fine per infraction was relatively consistent across seasons, ranging from $46.18 in spring to $46.52 in fall, with a standard deviation of $0.15, indicating minimal variation in fines. The most frequent infraction type in all seasons was parking in a signed prohibited area, comprising 62,129 tickets in winter and 98,924 tickets in summer, which highlights a consistent enforcement focus on highway-signed parking violations. Overall, while ticket counts showed clear seasonal differences, the fine amounts themselves were stable, suggesting that changes in infraction frequency rather than fine policies drive seasonal variation.
@@ -172,24 +187,36 @@ Across the 2008-2024 period, the seasonal distribution of tickets is generally c
 
 Overall, ticket counts show clear seasonal variation, with fall and summer consistently accounting for the largest frequencies. In contrast, average and median fine amounts remain relatively uniform across seasons. 
 
+<div style="page-break-after: always"></div>
+
 ### 2.3.2 Monthly summary
 
 Monthly ticket counts gradually increase from February (140,374 tickets, 6.6% of the annual total) to a peak in October (204,337 tickets, 9.6%), suggesting that parking infractions rise in the autumn months before declining slightly in November and December.  
-![image](figures/figure_2_4.png)  
+<!-- ![image](figures/figure_2_4.png)   -->
+<img src="figures/figure_2_4.png" alt="image" style="width:70%;"/>
+
 **Figure 2.4:** Fine amount distribution by month.
 
-![image](figures/figure_2_5.png)  
+<!-- ![image](figures/figure_2_5.png)   -->
+<img src="figures/figure_2_5.png" alt="image" style="width:70%;"/>
+
 **Figure 2.5:** Ticket frequency by month.  
 Mean fines remained relatively stable across the year, ranging from $45.87 to $46.72 (SD ≈ $0.27), indicating consistent enforcement levels in terms of fine amounts. Across most months, the top infraction was parking in a prohibited area during the daytime, particularly dominant from March to November, whereas parking in a prohibited area without a permit was most common in January and April. These results indicate that seasonal and monthly patterns in ticket counts are primarily driven by fluctuations in infraction occurrence rather than changes in fine amounts.
+
+<div style="page-break-after: always"></div>
 
 ### 2.3.3 Hourly summary
 
 Examining ticket counts and fines by hour of day reveals a clear diurnal pattern (Figure 2.6, Figure 2.7). The fewest tickets are issued during the early morning hours of 5-7 AM (11,022-52,745 tickets, 0.5-2.5% of the total daily tickets), whereas ticketing peaks between 9 AM and 1 PM (136,374-160,435 tickets, 6.4-7.5% of daily total), indicating concentrated enforcement during typical commuting hours. Late evening hours, particularly 10 PM-11 PM, also show elevated ticket counts relative to early morning. Mean fines similarly vary throughout the day, with higher fines observed during peak commuting hours at approximately 50-55 CAD between 7-10 AM and 2-4 PM, while the lowest fines occur during early morning hours (30-39 CAD between 0-6 AM). This pattern suggests that both the frequency of infractions and corresponding enforcement intensity follow predictable daily cycles, likely reflecting traffic flow, parking demand, and municipal enforcement scheduling.
 
-![image](figures/figure_2_6.png)  
+<!-- ![image](figures/figure_2_6.png)   -->
+<img src="figures/figure_2_6.png" alt="image" style="width:95%;"/>
+
 **Figure 2.6:** Fine amount distribution by hour of day.
 
-![image](figures/figure_2_7.png)  
+<!-- ![image](figures/figure_2_7.png)   -->
+<img src="figures/figure_2_7.png" alt="image" style="width:85%;"/>
+
 **Figure 2.7:** Ticket frequency by hour of day.
 
 ### 2.3.4 Regression Methodology
@@ -205,8 +232,12 @@ log(E(Y)) \= β<sub>0</sub>+β<sub>1</sub>X<sub>1</sub>+β<sub>2</sub>X<sub>2</s
 
 To perform this analysis, tickets were aggregated by season, month, and hour depending on the model. We then fit a Poisson regression of the form: ticket\_count \~ C(season) \+ month \+ hour. The baselines for each temporal variable are fixed to the fall season, January (month 1), and midnight (hour 0\) respectively. This approach provides coefficient estimates, significance tests, and goodness-of-fit metrics that indicate whether temporal variables explain observed variation in infraction counts.
 
+<div style="page-break-after: always"></div>
+
 ### 2.3.5 Regression Analysis
-![image](figures/table_1.png)
+<!-- ![image](figures/table_1.png) -->
+<img src="figures/table_1.png" alt="image" style="width:80%;"/>
+
 ![image](figures/table_2.png)
 
 <!-- | Generalized Linear Model Regression Results \=================================================================== |  |  |  |  |
@@ -285,6 +316,8 @@ From Figure 3.1.1 and Figure 3.1.3, we can see that the top 10 issued infraction
 ![image](figures/figure_3_1_3.png)  
 **Figure 3.1.3**
 
+<div style="page-break-after: always"></div>
+
 ## 3.2 Top 10 Infraction Types in 2008 and 2024
 
 ![image](figures/figure_3_2_1.png)  
@@ -348,6 +381,8 @@ Overall, we find substantial spatial variation in both the frequency and severit
 ## 4.2. Descriptive Analysis
 
 Ticket issuance in Toronto has fluctuated considerably over the past 17 years. Annual totals range from a high of approximately 2.87 million tickets in 2008 to a low of about 1.40 million tickets in 2020, coinciding with reduced mobility during the COVID--19 pandemic. Ticket counts have since rebounded, reaching around 2.15 million in 2024\. These totals suggest that parking enforcement responds not only to bylaw constraints but also to broader societal and economic conditions. Sudden decreases in 2020--2021 reflect citywide mobility restrictions, while the post-pandemic rebound reflects a return toward pre-COVID traffic patterns.
+
+<div style="page-break-after: always"></div>
 
 ### 4.2.1 Summary Statistics
 
