@@ -507,12 +507,8 @@ The parking ticket data used in this study are freely available through the City
 
 # **Appendix**
 
-\[R code, Python\]  
+R and Python Code:
 [https://github.com/AshZein/STA304-Project](https://github.com/AshZein/STA304-Project)
-
-Seasonality and Time
-
-- Summary statistics: [STA304 Group Project](https://docs.google.com/spreadsheets/d/1kAp8wnsUk-hpJMs6StywsTDF6AKrj936eWpv5GoRPoc/edit?usp=sharing)
 
 ## Appendix A: Preprocessing dataset
 Data by season.
@@ -1688,3 +1684,8 @@ list(
 
 ---
 ```
+
+## Appendix G: Seasonality and Time spreadsheet
+Seasonality and Time
+
+- Summary statistics: [STA304 Group Project](https://docs.google.com/spreadsheets/d/1kAp8wnsUk-hpJMs6StywsTDF6AKrj936eWpv5GoRPoc/edit?usp=sharing)
